@@ -1,0 +1,1 @@
+* This folder stores the pre-trained models of RegNet, which can be downloaded from the following URL: https://pan.baidu.com/s/10wGyDmvx1zBDxo-MAjjWsQ.      Extraction code: 8888
