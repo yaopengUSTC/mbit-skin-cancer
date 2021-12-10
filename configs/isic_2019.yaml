@@ -1,0 +1,102 @@
+NAME: '_1'
+OUTPUT_DIR: './output/isic_2019'
+SHOW_STEP: 500
+SAVE_STEP: 2
+VALID_STEP: 2
+INPUT_SIZE: (224, 224)
+COLOR_SPACE: 'RGB'
+CPU_MODE: False
+GPUS: [0, 1]
+
+DATASET:
+  DATASET: 'isic_2019'
+  DATA_TYPE: 'jpg'
+  TRAIN_JSON: './jsons/converted_ISIC_2019_Train.json'
+  VALID_JSON: './jsons/converted_ISIC_2019_val_new_2.json'
+  TEST_JSON: './jsons/converted_ISIC_2019_Test.json'
+  VALID_ADD_ONE_CLASS: False
+  CLASS_NAME: ['MEL', 'NV', 'BCC', 'AK', 'BKL', 'DF', 'VASC', 'SCC']
+
+BACKBONE:
+  TYPE: 'RegNetY_8.0GF_DropBlock'
+  BBN: False
+  PRETRAINED: True
+  FREEZE: False
+  PRE_FREEZE: False
+  PRE_FREEZE_EPOCH: 5
+  DROP:
+    BLOCK_PROB: 0.1
+    BLOCK_SIZE: 5
+    NR_STEPS: 50000
+    OUT_PROB: 0.1
+
+MODULE:
+  TYPE: 'GAP'
+
+LOSS:
+  WEIGHT_POWER: 1.2
+  EXTRA_WEIGHT: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  LOSS_TYPE: 'MWNLoss'
+  SCHEDULER: 'cls'
+  DRW_EPOCH: 50
+  CLS_EPOCH_MIN: 20
+  CLS_EPOCH_MAX: 60
+  FOCAL:
+    TYPE: 'sigmoid'
+    SIGMOID: 'enlarge'
+  GHMC:
+    BINS: 10
+    MOMENTUM: 0.0
+  MWNL:
+    BETA: 0.1
+    TYPE: "fix"
+    SIGMOID: 'enlarge'
+
+CLASSIFIER:
+  TYPE: 'FC'
+  BIAS: True
+
+TRAIN:
+  BATCH_SIZE: 32
+  MAX_EPOCH: 70
+  NUM_WORKERS: 16
+  TENSORBOARD:
+    ENABLE: False
+  SAMPLER:
+    TYPE: 'default'
+    BORDER_CROP: 'ratio'
+    BORDER_CROP_PIXEL: 0
+    BORDER_CROP_RATIO: 0.0
+    IMAGE_RESIZE: True
+    IMAGE_RESIZE_SHORT: 450
+    AUGMENT:
+      NEED_AUGMENT: True
+      AUG_METHOD: 'v1_1'
+      AUG_PROB: 0.7
+      AUG_MAG: 10
+      AUG_LAYER_NUM: 2
+    DUAL_SAMPLER:
+      TYPE: 'reverse'
+    MULTI_CROP:
+      ENABLE: True
+      CROP_NUM: 16
+      L_REGION: 1.0
+      S_REGION: 1.0
+      SCHEME: 'average'
+    MULTI_SCALE:
+      ENABLE: False
+      SCALE_NUM: 12
+  OPTIMIZER:
+    TYPE: 'ADAM'
+    BASE_LR: 0.0002
+    MOMENTUM: 0.9
+    WEIGHT_DECAY: 1e-4
+  LR_SCHEDULER:
+    TYPE: 'multistep'
+    LR_STEP: [30, 40, 50, 60]
+    LR_FACTOR: 0.1
+
+TEST:
+  BATCH_SIZE: 240
+  NUM_WORKERS: 16
+
